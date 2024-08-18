@@ -51,11 +51,12 @@ local function generateArt(type, image)
     local imageWidth = image:width() - 1
     local imageHeight = image:height() - 1
     local string = ""
-    local loading = "Generating"
+    local loading = "["
+    local progress = 0
     if type == 0 then
         for i = 0, imageHeight, 1 do
             for j = 0, imageWidth, 1 do
-                loading = loading .. "."
+                loading = "["
                 local r, g, b = image(j, i)
                 local result = math.floor((r + g + b) / delta + 0.5)
                 if result < 1 then
@@ -63,17 +64,22 @@ local function generateArt(type, image)
                 elseif result > #characters then
                     result = #characters
                 end
+                progress = math.floor((i * imageWidth + j) / (imageWidth * imageHeight) * 100) 
+                for l = 1, progress, 1 do
+                    loading = loading .. "#"
+                end
+                print(result)
+                loading = loading .. "] " .. progress .. "%"
                 string = string .. characters[result] .. " "
                 print(loading)
                 os.execute("clear")
             end
-            loading = "Generating"
             string = string .. "\n"
         end
     else
         for i = 0, imageHeight, 1 do
             for j = 0, imageWidth, 1 do
-                loading = loading .. "."
+                loading = "["
                 local r, g, b = image(j, i)
                 local result = math.floor((r + g + b) / delta + 0.5)
                 if result < 1 then
@@ -81,12 +87,16 @@ local function generateArt(type, image)
                 elseif result >= #characters then
                     result = #characters - 1
                 end
+                progress = math.floor((i * imageWidth + j) / (imageWidth * imageHeight) * 100)
+                for l = 1, progress, 1 do
+                    loading = loading .. "#"
+                end
+                loading = loading .. "] " .. progress .. "%"
                 string = string .. characters[#characters - result] .. " "
                 print(loading)
                 os.execute("clear")
             end
             string = string .. "\n"
-            loading = "Generating"
         end
     end
     return string
@@ -99,7 +109,7 @@ local function main()
     -- -- debug
     -- local path = "./sampleImage2.jpeg"
     -- local desiredWidth = 90
-    -- local colorType = 1
+    -- local colorType = 0
 
     ImageFile = resizeImage(vips.Image.new_from_file(path), desiredWidth)
 
